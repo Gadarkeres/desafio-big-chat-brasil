@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bcb-postgres
+    environment:
+      POSTGRES_DB: big_chat_brasil
+      POSTGRES_USER: bcb_user
+      POSTGRES_PASSWORD: bcb_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
