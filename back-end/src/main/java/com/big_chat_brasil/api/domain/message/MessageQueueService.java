@@ -32,12 +32,6 @@ public class MessageQueueService {
         return Optional.ofNullable(queue.poll());
     }
 
-    public List<QueuedMessage> snapshot() {
-        return queue.stream()
-                .sorted(queuedMessageComparator())
-                .toList();
-    }
-
     private Comparator<QueuedMessage> queuedMessageComparator() {
         return Comparator
                 .comparing((QueuedMessage queuedMessage) -> queuedMessage.priority() == MessagePriority.URGENT ? 0 : 1)

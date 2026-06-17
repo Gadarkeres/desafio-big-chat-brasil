@@ -3,6 +3,7 @@ package com.big_chat_brasil.api.domain.message;
 import com.big_chat_brasil.api.domain.auth.CurrentClientService;
 import com.big_chat_brasil.api.domain.client.Client;
 import com.big_chat_brasil.api.domain.message.dto.MessageResponse;
+import com.big_chat_brasil.api.domain.message.dto.SendMessageCommand;
 import com.big_chat_brasil.api.domain.message.dto.SendMessageRequest;
 import com.big_chat_brasil.api.domain.message.dto.SendMessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +66,7 @@ public class MessageController {
         Client client = currentClientService.getAuthenticatedClient(authorizationHeader);
         Message message = messageService.sendMessage(
                 client,
-                new MessageService.SendMessageCommand(request.conversationId(), request.content(), request.priority())
+                new SendMessageCommand(request.conversationId(), request.content(), request.priority())
         );
 
         return SendMessageResponse.from(message, client);

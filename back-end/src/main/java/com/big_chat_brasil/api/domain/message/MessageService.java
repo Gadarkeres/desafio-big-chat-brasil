@@ -7,6 +7,7 @@ import com.big_chat_brasil.api.domain.enums.MessagePriority;
 import com.big_chat_brasil.api.domain.enums.MessageStatus;
 import com.big_chat_brasil.api.domain.enums.SenderType;
 import com.big_chat_brasil.api.domain.financial.FinancialService;
+import com.big_chat_brasil.api.domain.message.dto.SendMessageCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,11 +47,12 @@ public class MessageService {
 
         Message savedMessage = messageRepository.save(message);
         financialService.chargeMessage(client, savedMessage);
-        messageQueueService.enqueue(savedMessage);
+        enqueueMessage(savedMessage);
 
         return savedMessage;
     }
 
-    public record SendMessageCommand(UUID conversationId, String content, MessagePriority priority) {
+    private void enqueueMessage(Message message) {
+        messageQueueService.enqueue(message);
     }
 }
