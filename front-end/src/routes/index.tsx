@@ -6,10 +6,9 @@ import {
   Route,
   Routes,
 } from 'react-router-dom'
+import { AUTH_TOKEN_KEY } from '../config/auth'
 import { ChatPage } from '../pages/ChatPage'
 import { LoginPage } from '../pages/LoginPage'
-
-const AUTH_TOKEN_KEY = 'bcb_token'
 
 function PrivateRoute() {
   const token = Cookies.get(AUTH_TOKEN_KEY)
