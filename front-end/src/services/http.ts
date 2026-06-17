@@ -43,7 +43,7 @@ http.interceptors.response.use(
 
       notify({
         type: 'warning',
-        message: isLoginPage ? 'Login ou senha incorretos' : 'Sessão expirada, por favor faça login novamente',
+        message: isLoginPage ? 'Tipo de documento ou registro incorretos' : 'Sessão expirada, por favor faça login novamente',
         description: isLoginPage
           ? 'Verifique os dados informados e tente novamente.'
           : 'Faça login novamente para continuar.',
