@@ -1,3 +1,10 @@
+import { LoginForm } from '../components/auth/LoginForm'
+import './LoginPage.css'
+
 export function LoginPage() {
-  return <div>Login</div>
+  return (
+    <main className="login-page">
+      <LoginForm />
+    </main>
+  )
 }
