@@ -4,7 +4,6 @@ import com.big_chat_brasil.api.domain.auth.dto.AuthResult;
 import com.big_chat_brasil.api.domain.client.Client;
 import com.big_chat_brasil.api.domain.client.ClientService;
 import com.big_chat_brasil.api.domain.enums.DocumentType;
-import com.big_chat_brasil.api.exception.BadRequestException;
 import com.big_chat_brasil.api.exception.NotFoundException;
 import com.big_chat_brasil.api.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +24,16 @@ public class AuthService {
 
     @Transactional
     public AuthResult authenticate(String documentId, DocumentType documentType) {
-        Client client = clientService.findByDocument(documentId, documentType);
+        Client client;
+
+        try {
+            client = clientService.findByDocument(documentId, documentType);
+        } catch (NotFoundException exception) {
+            throw new UnauthorizedException("Credenciais inválidas");
+        }
 
         if (!Boolean.TRUE.equals(client.getActive())) {
-            throw new BadRequestException("Cliente inativo");
+            throw new UnauthorizedException("Credenciais inválidas");
         }
 
         AuthToken authToken = new AuthToken();
@@ -43,7 +48,7 @@ public class AuthService {
     @Transactional(readOnly = true)
     public Client getClientByToken(String token) {
         AuthToken authToken = authTokenRepository.findByToken(token)
-                .orElseThrow(() -> new UnauthorizedException("Token inválido"));
+                .orElseThrow(() -> new UnauthorizedException("Token invalido"));
 
         if (authToken.getExpiresAt() != null && authToken.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new UnauthorizedException("Token expirado");
