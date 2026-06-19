@@ -1,15 +1,19 @@
-import { LogoutOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons'
-import { Avatar, Badge, Button, Dropdown, Input, List, Typography } from 'antd'
+import { InfoCircleOutlined, LogoutOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons'
+import { Avatar, Badge, Button, Descriptions, Dropdown, Input, List, Modal, Tag, Typography } from 'antd'
 import type { MenuProps } from 'antd'
-import Cookies from 'js-cookie'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AUTH_TOKEN_KEY } from '../../config/auth'
+import { useStoredClient } from '../../hooks/useStoredClient'
+import { clearAuthSession } from '../../services/authStorage'
 import type { ConversationSummary } from '../../types/chat'
+import { formatCurrency } from '../../utils/currencyFormatter'
+import { formatConversationTime } from '../../utils/dateFormatter'
 
 type ConversationSidebarProps = {
   conversations: ConversationSummary[]
   selectedConversationId?: string
   search: string
+  isLoading?: boolean
   onSearchChange: (value: string) => void
   onSelectConversation: (conversationId: string) => void
 }
@@ -18,19 +22,31 @@ export function ConversationSidebar({
   conversations,
   selectedConversationId,
   search,
+  isLoading,
   onSearchChange,
   onSelectConversation,
 }: ConversationSidebarProps) {
   const navigate = useNavigate()
+  const client = useStoredClient()
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false)
 
   const menuItems: MenuProps['items'] = [
+    {
+      key: 'info',
+      icon: <InfoCircleOutlined />,
+      label: 'Informações da conta',
+      onClick: () => setIsInfoModalOpen(true),
+    },
+    {
+      type: 'divider',
+    },
     {
       key: 'logout',
       danger: true,
       icon: <LogoutOutlined />,
       label: 'Sair',
       onClick: () => {
-        Cookies.remove(AUTH_TOKEN_KEY)
+        clearAuthSession()
         navigate('/login', { replace: true })
       },
     },
@@ -59,6 +75,7 @@ export function ConversationSidebar({
       <List
         className="conversation-sidebar__list"
         dataSource={conversations}
+        loading={isLoading}
         locale={{ emptyText: 'Nenhuma conversa encontrada' }}
         renderItem={(conversation) => {
           const isSelected = conversation.id === selectedConversationId
@@ -73,7 +90,7 @@ export function ConversationSidebar({
                 title={
                   <div className="conversation-item__title">
                     <span>{conversation.recipientName}</span>
-                    <small>{conversation.lastMessageTime}</small>
+                    <small>{formatConversationTime(conversation.lastMessageTime)}</small>
                   </div>
                 }
                 description={
@@ -89,6 +106,54 @@ export function ConversationSidebar({
           )
         }}
       />
+
+      <Modal
+        title="Informações da conta"
+        open={isInfoModalOpen}
+        onCancel={() => setIsInfoModalOpen(false)}
+        footer={null}
+      >
+        {client && (
+          <Descriptions
+            className="account-info"
+            column={1}
+            size="small"
+            items={[
+              {
+                key: 'name',
+                label: 'Cliente',
+                children: client.name,
+              },
+              {
+                key: 'document',
+                label: client.documentType,
+                children: client.documentId,
+              },
+              {
+                key: 'plan',
+                label: 'Plano',
+                children: client.planType === 'prepaid' ? 'Pre-pago' : 'Pos-pago',
+              },
+              {
+                key: 'status',
+                label: 'Status',
+                children: (
+                  <Tag color={client.active ? 'green' : 'red'}>
+                    {client.active ? 'Ativo' : 'Inativo'}
+                  </Tag>
+                ),
+              },
+              {
+                key: 'balance',
+                label: client.planType === 'prepaid' ? 'Saldo' : 'Limite restante',
+                children: formatCurrency(
+                  client.planType === 'prepaid' ? client.balance : client.limit,
+                ),
+              },
+            ]}
+          />
+        )}
+      </Modal>
     </aside>
   )
 }

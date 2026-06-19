@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { Button, Card, Form, Input, Select } from 'antd'
-import Cookies from 'js-cookie'
 import { useNavigate } from 'react-router-dom'
-import { AUTH_TOKEN_KEY } from '../../config/auth'
+import { setAuthSession } from '../../services/authStorage'
 import { authenticateClient } from '../../services/authService'
 import { useNotificationService } from '../../services/notificationService'
 import type { AuthRequest } from '../../types/auth'
@@ -19,7 +18,7 @@ export function LoginForm() {
   const { mutate, isPending } = useMutation({
     mutationFn: authenticateClient,
     onSuccess: (response) => {
-      Cookies.set(AUTH_TOKEN_KEY, response.token, { sameSite: 'strict' })
+      setAuthSession(response.token, response.client)
 
       notify({
         type: 'success',

@@ -1,6 +1,5 @@
 import axios from 'axios'
-import Cookies from 'js-cookie'
-import { AUTH_TOKEN_KEY } from '../config/auth'
+import { clearAuthSession, getAuthToken } from './authStorage'
 import { notify } from './notificationService'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
@@ -15,7 +14,7 @@ export const http = axios.create({
 })
 
 http.interceptors.request.use((config) => {
-  const token = Cookies.get(AUTH_TOKEN_KEY)
+  const token = getAuthToken()
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -50,7 +49,7 @@ http.interceptors.response.use(
       })
 
       if (!isLoginPage) {
-        Cookies.remove(AUTH_TOKEN_KEY)
+        clearAuthSession()
         window.location.replace('/login')
       }
     }

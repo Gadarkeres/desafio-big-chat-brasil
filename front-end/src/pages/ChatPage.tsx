@@ -2,11 +2,11 @@ import { Drawer, Grid, Splitter } from 'antd'
 import { useMemo, useState } from 'react'
 import { ChatWindow } from '../components/chat/ChatWindow'
 import { ConversationSidebar } from '../components/chat/ConversationSidebar'
-import type { ChatMessage, ConversationSummary } from '../types/chat'
+import { useConversationMessages } from '../hooks/useConversationMessages'
+import { useConversations } from '../hooks/useConversations'
+import { useSendMessage } from '../hooks/useSendMessage'
+import type { MessagePriority } from '../types/chat'
 import './ChatPage.css'
-
-const conversations: ConversationSummary[] = []
-const messages: ChatMessage[] = []
 
 export function ChatPage() {
   const screens = Grid.useBreakpoint()
@@ -14,6 +14,12 @@ export function ChatPage() {
   const [search, setSearch] = useState('')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [selectedConversationId, setSelectedConversationId] = useState<string>()
+  const conversationsQuery = useConversations()
+  const sendMessageMutation = useSendMessage()
+  const conversations = conversationsQuery.data ?? []
+  const activeConversationId = selectedConversationId ?? conversations[0]?.id
+  const messagesQuery = useConversationMessages(activeConversationId)
+  const messages = messagesQuery.data ?? []
 
   const filteredConversations = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
@@ -25,14 +31,10 @@ export function ChatPage() {
     return conversations.filter((conversation) =>
       conversation.recipientName.toLowerCase().includes(normalizedSearch),
     )
-  }, [search])
+  }, [conversations, search])
 
   const selectedConversation = conversations.find(
-    (conversation) => conversation.id === selectedConversationId,
-  )
-
-  const selectedMessages = messages.filter(
-    (message) => message.conversationId === selectedConversationId,
+    (conversation) => conversation.id === activeConversationId,
   )
 
   function handleSelectConversation(conversationId: string) {
@@ -40,11 +42,24 @@ export function ChatPage() {
     setIsDrawerOpen(false)
   }
 
+  function handleSendMessage(content: string, priority: MessagePriority) {
+    if (!activeConversationId) {
+      return
+    }
+
+    sendMessageMutation.mutate({
+      conversationId: activeConversationId,
+      content,
+      priority,
+    })
+  }
+
   const sidebar = (
     <ConversationSidebar
       conversations={filteredConversations}
-      selectedConversationId={selectedConversationId}
+      selectedConversationId={activeConversationId}
       search={search}
+      isLoading={conversationsQuery.isLoading}
       onSearchChange={setSearch}
       onSelectConversation={handleSelectConversation}
     />
@@ -67,8 +82,11 @@ export function ChatPage() {
 
         <ChatWindow
           conversation={selectedConversation}
-          messages={selectedMessages}
+          messages={messages}
+          isLoading={messagesQuery.isLoading}
+          isSending={sendMessageMutation.isPending}
           onOpenConversations={() => setIsDrawerOpen(true)}
+          onSendMessage={handleSendMessage}
         />
       </main>
     )
@@ -82,7 +100,13 @@ export function ChatPage() {
         </Splitter.Panel>
 
         <Splitter.Panel min={360}>
-          <ChatWindow conversation={selectedConversation} messages={selectedMessages} />
+          <ChatWindow
+            conversation={selectedConversation}
+            messages={messages}
+            isLoading={messagesQuery.isLoading}
+            isSending={sendMessageMutation.isPending}
+            onSendMessage={handleSendMessage}
+          />
         </Splitter.Panel>
       </Splitter>
     </main>

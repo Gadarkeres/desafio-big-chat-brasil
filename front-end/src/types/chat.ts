@@ -24,3 +24,19 @@ export type ChatMessage = {
   status: MessageStatus
   cost: number
 }
+
+export type SendMessageRequest = {
+  conversationId: string
+  recipientId?: string
+  content: string
+  priority: MessagePriority
+}
+
+export type SendMessageResponse = {
+  id: string
+  status: 'queued'
+  timestamp: string
+  estimatedDelivery: string
+  cost: number
+  currentBalance?: number
+}

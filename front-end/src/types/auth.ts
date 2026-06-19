@@ -7,16 +7,18 @@ export type AuthRequest = {
   documentType: DocumentType
 }
 
+export type AuthClient = {
+  id: string
+  name: string
+  documentId: string
+  documentType: DocumentType
+  balance?: number
+  limit?: number
+  planType: PlanType
+  active: boolean
+}
+
 export type AuthResponse = {
   token: string
-  client: {
-    id: string
-    name: string
-    documentId: string
-    documentType: DocumentType
-    balance?: number
-    limit?: number
-    planType: PlanType
-    active: boolean
-  }
+  client: AuthClient
 }
