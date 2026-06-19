@@ -7,7 +7,6 @@ import com.big_chat_brasil.api.domain.message.dto.SendMessageCommand;
 import com.big_chat_brasil.api.domain.message.dto.SendMessageRequest;
 import com.big_chat_brasil.api.domain.message.dto.SendMessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
