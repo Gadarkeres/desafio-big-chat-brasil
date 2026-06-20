@@ -84,6 +84,22 @@ Além do mínimo solicitado, foram implementados:
 - Swagger/OpenAPI.
 - Docker Compose para executar banco, backend e frontend.
 - Seed demonstrativo com 10 conversas para apresentação.
+- Testes unitários básicos no backend.
+
+## Testes
+
+Foram implementados testes unitários básicos no backend com JUnit e Mockito, cobrindo:
+
+- Regras financeiras: cálculo de custo, débito pré-pago, consumo de limite pós-pago e bloqueio por saldo/limite insuficiente.
+- Fila de mensagens: prioridade urgente antes da normal e preservação da ordem de chegada para mensagens com a mesma prioridade.
+- Processamento de mensagens: transições de status para processando, enviada e falha.
+
+Para executar os testes do backend:
+
+```bash
+cd back-end
+mvn test
+```
 
 ## Como Rodar com Docker
 
