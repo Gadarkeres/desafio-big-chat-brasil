@@ -10,7 +10,6 @@ Aplicação fullstack para o desafio técnico BCB. O projeto implementa uma plat
 - Spring Boot
 - Spring Web
 - Spring Data JPA
-- Spring Security
 - Bean Validation
 - PostgreSQL
 - Flyway
@@ -35,7 +34,7 @@ Aplicação fullstack para o desafio técnico BCB. O projeto implementa uma plat
 ### Backend
 
 - API de autenticação por CPF/CNPJ.
-- Geração e validação de token simples.
+- Geração e validação de token Bearer persistido em banco.
 - Listagem de conversas do cliente autenticado.
 - Listagem de mensagens de uma conversa.
 - Envio de mensagens com prioridade normal ou urgente.
@@ -68,7 +67,7 @@ Aplicação fullstack para o desafio técnico BCB. O projeto implementa uma plat
 
 - Fluxo completo: login → listar conversas → abrir conversa → listar mensagens → enviar mensagem.
 - Comunicação via REST API.
-- Token enviado no header `Authorization`.
+- Autenticação customizada por token Bearer enviado no header `Authorization`.
 - Interceptor Axios para autenticação e tratamento de erros.
 - Atualização dos dados com TanStack Query.
 - Polling simples para atualizar mensagens e status sem WebSocket.
