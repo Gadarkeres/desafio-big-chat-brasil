@@ -27,7 +27,7 @@ public class ConversationService {
     public List<ConversationResponse> findResponsesByClient(Client client) {
         return conversationRepository.findByClientIdOrderByUpdatedAtDesc(client.getId())
                 .stream()
-                .map(conversation -> ConversationResponse.from(
+                .map(conversation -> ConversationResponse.fromConversation(
                         conversation,
                         messageRepository.findFirstByConversationIdOrderByQueuedAtDesc(conversation.getId())
                 ))

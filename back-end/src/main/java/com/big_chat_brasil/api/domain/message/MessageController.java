@@ -3,7 +3,6 @@ package com.big_chat_brasil.api.domain.message;
 import com.big_chat_brasil.api.domain.auth.CurrentClientService;
 import com.big_chat_brasil.api.domain.client.Client;
 import com.big_chat_brasil.api.domain.message.dto.MessageResponse;
-import com.big_chat_brasil.api.domain.message.dto.SendMessageCommand;
 import com.big_chat_brasil.api.domain.message.dto.SendMessageRequest;
 import com.big_chat_brasil.api.domain.message.dto.SendMessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,11 +41,7 @@ public class MessageController {
             @PathVariable UUID conversationId
     ) {
         Client client = currentClientService.getAuthenticatedClient(authorizationHeader);
-
-        return messageService.findByConversation(conversationId, client)
-                .stream()
-                .map(MessageResponse::from)
-                .toList();
+        return messageService.findResponsesByConversation(conversationId, client);
     }
 
     @Operation(
@@ -63,11 +58,6 @@ public class MessageController {
             @Valid @RequestBody SendMessageRequest request
     ) {
         Client client = currentClientService.getAuthenticatedClient(authorizationHeader);
-        Message message = messageService.sendMessage(
-                client,
-                new SendMessageCommand(request.conversationId(), request.content(), request.priority())
-        );
-
-        return SendMessageResponse.from(message, client);
+        return messageService.sendMessage(client, request);
     }
 }

@@ -7,7 +7,10 @@ import com.big_chat_brasil.api.domain.enums.MessagePriority;
 import com.big_chat_brasil.api.domain.enums.MessageStatus;
 import com.big_chat_brasil.api.domain.enums.SenderType;
 import com.big_chat_brasil.api.domain.financial.FinancialService;
+import com.big_chat_brasil.api.domain.message.dto.MessageResponse;
 import com.big_chat_brasil.api.domain.message.dto.SendMessageCommand;
+import com.big_chat_brasil.api.domain.message.dto.SendMessageRequest;
+import com.big_chat_brasil.api.domain.message.dto.SendMessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,13 +31,25 @@ public class MessageService {
     private final MessageQueueService messageQueueService;
 
     @Transactional(readOnly = true)
-    public List<Message> findByConversation(UUID conversationId, Client client) {
+    public List<MessageResponse> findResponsesByConversation(UUID conversationId, Client client) {
         Conversation conversation = conversationService.findByIdAndClient(conversationId, client);
-        return messageRepository.findByConversationIdOrderByQueuedAtAsc(conversation.getId());
+        List<Message> messages = messageRepository.findByConversationIdOrderByQueuedAtAsc(conversation.getId());
+
+        return messages.stream().map(MessageResponse::fromMessage).toList();
     }
 
     @Transactional
-    public Message sendMessage(Client client, SendMessageCommand command) {
+    public SendMessageResponse sendMessage(Client client, SendMessageRequest request) {
+        Message message = processSendMessage(
+                client,
+                new SendMessageCommand(request.conversationId(), request.content(), request.priority())
+        );
+
+        return SendMessageResponse.fromMessage(message, client);
+    }
+
+    @Transactional
+    public Message processSendMessage(Client client, SendMessageCommand command) {
         Conversation conversation = conversationService.findByIdAndClient(command.conversationId(), client);
         log.info(
                 "Solicitação de envio de mensagem recebida. clientId={} conversationId={} priority={}",

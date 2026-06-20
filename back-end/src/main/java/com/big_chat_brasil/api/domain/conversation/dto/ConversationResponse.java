@@ -15,7 +15,7 @@ public record ConversationResponse(
         int unreadCount
 ) {
 
-    public static ConversationResponse from(Conversation conversation, Message lastMessage) {
+    public static ConversationResponse fromConversation(Conversation conversation, Message lastMessage) {
         return new ConversationResponse(
                 conversation.getId(),
                 conversation.getRecipient().getId(),

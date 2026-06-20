@@ -18,7 +18,7 @@ public record SendMessageResponse(
         BigDecimal currentBalance
 ) {
 
-    public static SendMessageResponse from(Message message, Client client) {
+    public static SendMessageResponse fromMessage(Message message, Client client) {
         return new SendMessageResponse(
                 message.getId(),
                 message.getStatus().name().toLowerCase(),

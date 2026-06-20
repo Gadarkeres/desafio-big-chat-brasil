@@ -15,7 +15,7 @@ public class CurrentClientService {
 
     public Client getAuthenticatedClient(String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
-            throw new BadRequestException("Token de autenticacao não informado");
+            throw new BadRequestException("Token de autenticação não informado");
         }
 
         return authService.getClientByToken(authorizationHeader.substring(BEARER_PREFIX.length()));

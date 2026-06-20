@@ -1,6 +1,6 @@
 package com.big_chat_brasil.api.domain.auth;
 
-import com.big_chat_brasil.api.domain.auth.dto.AuthResult;
+import com.big_chat_brasil.api.domain.auth.dto.AuthResponse;
 import com.big_chat_brasil.api.domain.client.Client;
 import com.big_chat_brasil.api.domain.client.ClientService;
 import com.big_chat_brasil.api.domain.enums.DocumentType;
@@ -25,7 +25,7 @@ public class AuthService {
     private final AuthTokenRepository authTokenRepository;
 
     @Transactional
-    public AuthResult authenticate(String documentId, DocumentType documentType) {
+    public AuthResponse authenticate(String documentId, DocumentType documentType) {
         Client client;
 
         try {
@@ -47,7 +47,8 @@ public class AuthService {
 
         AuthToken savedToken = authTokenRepository.save(authToken);
         log.info("Cliente autenticado com sucesso. clientId={} expiresAt={}", client.getId(), savedToken.getExpiresAt());
-        return new AuthResult(savedToken.getToken(), client);
+
+        return AuthResponse.fromTokenAndClient(savedToken.getToken(), client);
     }
 
     @Transactional(readOnly = true)

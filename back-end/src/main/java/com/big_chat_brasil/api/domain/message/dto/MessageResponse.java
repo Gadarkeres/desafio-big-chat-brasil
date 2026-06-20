@@ -17,7 +17,7 @@ public record MessageResponse(
         BigDecimal cost
 ) {
 
-    public static MessageResponse from(Message message) {
+    public static MessageResponse fromMessage(Message message) {
         return new MessageResponse(
                 message.getId(),
                 message.getConversation().getId(),

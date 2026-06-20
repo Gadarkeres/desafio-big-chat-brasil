@@ -54,14 +54,19 @@ public class Message extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime queuedAt;
 
+    @Column
     private LocalDateTime processingAt;
 
+    @Column
     private LocalDateTime sentAt;
 
+    @Column
     private LocalDateTime deliveredAt;
 
+    @Column
     private LocalDateTime readAt;
 
+    @Column
     private LocalDateTime failedAt;
 
     @Column(length = 255)

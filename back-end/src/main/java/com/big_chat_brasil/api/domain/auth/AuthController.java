@@ -28,6 +28,6 @@ public class AuthController {
     @PostMapping("/auth")
     @ResponseStatus(HttpStatus.OK)
     public AuthResponse authenticate(@Valid @RequestBody AuthRequest request) {
-        return AuthResponse.from(authService.authenticate(request.documentId(), request.documentType()));
+        return authService.authenticate(request.documentId(), request.documentType());
     }
 }
