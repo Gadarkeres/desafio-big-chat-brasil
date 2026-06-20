@@ -7,6 +7,7 @@ import com.big_chat_brasil.api.domain.enums.DocumentType;
 import com.big_chat_brasil.api.exception.NotFoundException;
 import com.big_chat_brasil.api.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private static final int TOKEN_EXPIRATION_HOURS = 12;
@@ -29,10 +31,12 @@ public class AuthService {
         try {
             client = clientService.findByDocument(documentId, documentType);
         } catch (NotFoundException exception) {
+            log.warn("Tentativa de login com credenciais inválidas. documentType={}", documentType);
             throw new UnauthorizedException("Credenciais inválidas");
         }
 
         if (!Boolean.TRUE.equals(client.getActive())) {
+            log.warn("Tentativa de login para cliente inativo. clientId={}", client.getId());
             throw new UnauthorizedException("Credenciais inválidas");
         }
 
@@ -42,6 +46,7 @@ public class AuthService {
         authToken.setExpiresAt(LocalDateTime.now().plusHours(TOKEN_EXPIRATION_HOURS));
 
         AuthToken savedToken = authTokenRepository.save(authToken);
+        log.info("Cliente autenticado com sucesso. clientId={} expiresAt={}", client.getId(), savedToken.getExpiresAt());
         return new AuthResult(savedToken.getToken(), client);
     }
 
@@ -51,10 +56,12 @@ public class AuthService {
                 .orElseThrow(() -> new UnauthorizedException("Token invalido"));
 
         if (authToken.getExpiresAt() != null && authToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            log.warn("Token expirado usado em requisição. clientId={}", authToken.getClient().getId());
             throw new UnauthorizedException("Token expirado");
         }
 
         if (!Boolean.TRUE.equals(authToken.getClient().getActive())) {
+            log.warn("Token de cliente inativo usado em requisição. clientId={}", authToken.getClient().getId());
             throw new UnauthorizedException("Cliente inativo");
         }
 

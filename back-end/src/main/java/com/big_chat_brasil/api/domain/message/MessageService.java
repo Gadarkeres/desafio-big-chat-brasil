@@ -9,6 +9,7 @@ import com.big_chat_brasil.api.domain.enums.SenderType;
 import com.big_chat_brasil.api.domain.financial.FinancialService;
 import com.big_chat_brasil.api.domain.message.dto.SendMessageCommand;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MessageService {
 
     private final MessageRepository messageRepository;
@@ -34,6 +36,12 @@ public class MessageService {
     @Transactional
     public Message sendMessage(Client client, SendMessageCommand command) {
         Conversation conversation = conversationService.findByIdAndClient(command.conversationId(), client);
+        log.info(
+                "Solicitação de envio de mensagem recebida. clientId={} conversationId={} priority={}",
+                client.getId(),
+                conversation.getId(),
+                command.priority()
+        );
 
         Message message = new Message();
         message.setConversation(conversation);
@@ -48,6 +56,12 @@ public class MessageService {
         Message savedMessage = messageRepository.save(message);
         financialService.chargeMessage(client, savedMessage);
         enqueueMessage(savedMessage);
+        log.info(
+                "Mensagem criada e enfileirada. messageId={} conversationId={} priority={}",
+                savedMessage.getId(),
+                conversation.getId(),
+                savedMessage.getPriority()
+        );
 
         return savedMessage;
     }
