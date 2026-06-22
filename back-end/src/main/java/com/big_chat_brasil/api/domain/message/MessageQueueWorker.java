@@ -46,7 +46,7 @@ public class MessageQueueWorker {
 
             Thread.sleep(DELIVERY_SIMULATION_MS);
             messageProcessingService.markAsSent(queuedMessage.messageId());
-        } catch (InterruptedException exception) {
+        } catch (InterruptedException exception) { // Thread interrompida
             Thread.currentThread().interrupt();
             log.error("Worker interrompido durante processamento. messageId={}", queuedMessage.messageId(), exception);
             markAsFailedSafely(queuedMessage, "Processamento interrompido");

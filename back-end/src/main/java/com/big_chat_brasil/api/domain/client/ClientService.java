@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class ClientService {
@@ -17,12 +15,6 @@ public class ClientService {
     @Transactional(readOnly = true)
     public Client findByDocument(String documentId, DocumentType documentType) {
         return clientRepository.findByDocumentIdAndDocumentType(documentId, documentType)
-                .orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
-    }
-
-    @Transactional(readOnly = true)
-    public Client findById(UUID clientId) {
-        return clientRepository.findById(clientId)
                 .orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
     }
 
