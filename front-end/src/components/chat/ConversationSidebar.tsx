@@ -145,7 +145,7 @@ export function ConversationSidebar({
               },
               {
                 key: 'balance',
-                label: client.planType === 'prepaid' ? 'Saldo' : 'Limite restante',
+                label: client.planType === 'prepaid' ? 'Saldo' : 'Limite mensal',
                 children: formatCurrency(
                   client.planType === 'prepaid' ? client.balance : client.limit,
                 ),
